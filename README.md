@@ -26,6 +26,7 @@
 ## 单词生成
 执行 `node words --src=example.txt --level=1 --length=3 --dst=data/words.json`生成目标单词表，各参数说明：
 |名称|说明|是否必须|默认值|
+|---|----|---|---|
 |src|电子书文本文件路径|是|无|
 |dst|单词表json生成路径|否|data/words.json|
 |level|过滤等级|否|1|
@@ -33,6 +34,7 @@
 
 参数`level`的取值：
 |值|说明|
+|--|--|
 |1|所有单词|
 |2|不添加中高考、CET4单词|
 |3|不添加CET6单词|
