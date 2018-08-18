@@ -18,7 +18,7 @@
 ## 使用说明
 
 * 运行 `npm i` 初始化
-* 创建 `data` 目录，从[ECDICT的Release](https://github.com/skywind3000/ECDICT/releases)中下载`sqlite`解压到此目录
+* 创建 `data` 目录，从[ECDICT的Release](https://github.com/skywind3000/ECDICT/releases)中下载`sqlite`词典数据库解压到此目录
 * 执行 `node words --src=example.txt` 生成单词表
 * 运行 `node server` 
 * 浏览器打开 `localhost:3003` ，把设备放在一边，等待路过的时候背单词
@@ -41,6 +41,9 @@
 |2|不添加中高考、CET4单词|
 |3|不添加CET6单词|
 |4|不添加柯林斯3、4、5星的单词|
+
+## 存档管理
+存档文件默认为 `data/progress.json` 及 `data/progress.db` ，在 `config.js` 中可修改这些文件以及词典数据库的读取路径
 
 ## MIT
 
