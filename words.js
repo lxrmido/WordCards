@@ -6,16 +6,19 @@ const async = require('async');
 const fs = require('fs');
 
 if (!fs.existsSync(config.dict_db_file)) {
-    console.log('Sqlite db file "' + config.dict_db_file + '" not found, please get it from "https://github.com/skywind3000/ECDICT/releases"');
+    console.log('Sqlite db file "' + config.dict_db_file + '" missing, please get it from "https://github.com/skywind3000/ECDICT/releases"');
 } else if (!argv.src) {
     console.log('Missing arguments: src');
     console.log('Example: node words --src=example.txt');
 } else {
+    /*
+     * Load args
+     * --src, --dst, --level, --length
+     */
     var src = argv.src;
     var dst = config.words_json_file;
     var level = 1;
     var length = 2;
-    console.log('Words from:' + src);
     if (argv.dst) {
         dst = argv.dst;
     }
@@ -25,6 +28,9 @@ if (!fs.existsSync(config.dict_db_file)) {
     if (argv.length > 0){
         length = parseInt(argv.length);
     }
+
+    console.log('Words from:' + src);
+
     essay.extract(src, (err, map) => {
         if (err) {
             console.log(err);

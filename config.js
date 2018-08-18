@@ -3,4 +3,5 @@ module.exports = {
     dict_db_file: './data/stardict.db',
     progress_db_file: './data/progress.db',
     progress_json_file: './data/progress.json',
+    web_server_port: 3003
 };
