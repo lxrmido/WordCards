@@ -1,5 +1,5 @@
 # WordCards
-将英文电子书中的单词提取出来，然后通过树莓派、限制的电脑等有屏幕的设备，利用路过屏幕的碎片时间背单词。
+* 将英文电子书中的单词提取出来，然后通过树莓派、闲置的电脑、NAS等有屏幕的设备，利用路过屏幕的碎片时间背单词。
 ![](docs/imgs/p2.png)
 * 本项目所用词典来源于 [ECDICT](https://github.com/skywind3000/ECDICT) 
 * 英文点子书请自行从[manybooks](http://manybooks.net/)等站点自行下载
@@ -13,6 +13,7 @@
 [ ] 配色及主题更改功能
 [ ] 基于 ElectronJS 的客户端
 [ ] 基于 ReactNative 的移动端
+[ ] 为树莓派客户端添加 e-ink 输出
 
 ## 使用说明
 
