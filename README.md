@@ -8,6 +8,9 @@
 * 本项目所用词典来源于 [ECDICT](https://github.com/skywind3000/ECDICT) 
 * 英文点子书请自行从[manybooks](http://manybooks.net/)等站点自行下载
 
+## 更新日志
+* 2018-08-23 用vue重构前端，添加快捷键功能
+
 ## 项目进度
 - [x] 从文本文件中提取出单词表，并利用词典查询得到单词卡片
 - [x] 提供单词卡片的服务端

@@ -1,6 +1,7 @@
 const Koa = require('koa')
 const Static = require('koa-static');
-const Router = require('koa-router')
+const Router = require('koa-router');
+const BodyParser = require('koa-bodyparser');
 const path = require('path');
 const config = require('./config')
 const progress = require('./lib/progress');
@@ -18,9 +19,12 @@ apiRouter.post('/word', async (ctx) => {
     latestWordProgress = r.progress;
     ctx.body = makeJsonReturn(r);
 });
+apiRouter.post('/settings', async (ctx) => {
+    ctx.body = makeJsonReturn(getSettings());
+});
 apiRouter.post('/prev', async (ctx) => {
     progress.vars.index -= 1;
-    let r = await getCurrentCard();
+    let r = await getCurrentCard(true);
     latestWordProgress = r.progress;
     ctx.body = makeJsonReturn(r);
     progress.save();
@@ -57,7 +61,18 @@ apiRouter.post('/ignore', async (ctx) => {
     }
     ctx.body = makeJsonReturn();
 });
+apiRouter.post('/setkey', async (ctx) => {
+    let key = ctx.request.body.key;
+    let val = ctx.request.body.val.split(',');
+    progress.vars['hk_' + key] = [];
+    val.forEach((x) => {
+        progress.vars['hk_' + key].push(parseInt(x));
+    });
+    progress.save();
+    ctx.body = makeJsonReturn();
+});
 
+app.use(BodyParser());
 app.use(Static(path.join(__dirname, './resource/static')));
 
 rootRouter.use('/api', apiRouter.routes(), apiRouter.allowedMethods());
@@ -77,34 +92,52 @@ function makeJsonReturn(d){
     });
 }
 
-function getCurrentCard(){
+function getCurrentCard(reverse){
     return new Promise((resolve, reject) => {
         fetchCurrentCard((card) => {
             resolve(card);
-        });
+        }, 1, !!reverse);
     });
 }
 
-function fetchCurrentCard(callback, tryTimes){
+function getSettings(){
+    return {
+        hotkeys: {
+            prev: progress.vars.hk_prev,
+            next: progress.vars.hk_next,
+            star: progress.vars.hk_star,
+            ignore: progress.vars.hk_ignore
+        }
+    }
+}
+
+function fetchCurrentCard(callback, tryTimes, reverse){
     var card;
     if (!tryTimes) {
         tryTimes = 1;
     } else if (tryTimes >= cards.length) {
         return callback(false);
     }
-    if (progress.vars.index < cards.length - 1) {
+    if (progress.vars.index < 0) {
+        progress.vars.index = cards.length - 1;
+        return fetchCurrentCard(callback, tryTimes + 1, reverse);
+    } else if (progress.vars.index < cards.length) {
         card = cards.get(progress.vars.index);
     } else {
         progress.vars.index = 0;
-        return fetchCurrentCard(callback, tryTimes + 1);
+        return fetchCurrentCard(callback, tryTimes + 1, reverse);
     }
     progress.getWord(card.word, (err, wordProgress) => {
         if (err) {
             return callback(false);
         }
         if (wordProgress.ignore === 1) {
-            progress.vars.index ++;
-            return fetchCurrentCard(callback, tryTimes + 1);
+            if (reverse) {
+                progress.vars.index --;
+            } else{
+                progress.vars.index ++;
+            }
+            return fetchCurrentCard(callback, tryTimes + 1, reverse);
         } else {
             return callback({
                 index: progress.vars.index,
