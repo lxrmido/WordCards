@@ -42,7 +42,7 @@ export default function (injection, Vue) {
         return fontSize + 'px ' + font;
     }
 
-    CanvasRenderingContext2D.prototype.getTextLines = function (text, maxWidth) {
+    CanvasRenderingContext2D.prototype.getTextLines = function (text, maxWidth, space) {
         maxWidth = maxWidth || this.canvas.width;
         var lines = [];
         var i, j;
@@ -51,7 +51,9 @@ export default function (injection, Vue) {
             for(i = text.length; this.measureText(text.substr(0,i)).width > maxWidth; i --);
             result = text.substr(0,i);
             if (i !== text.length) {
-                for(j = 0; result.indexOf(" ", j) !== -1; j = result.indexOf(" ", j) + 1);
+                if (!space) {
+                    for(j = 0; result.indexOf(" ", j) !== -1; j = result.indexOf(" ", j) + 1);
+                }
             }
             lines.push(result.substr(0, j || result.length));
             text  = text.substr( lines[ lines.length-1 ].length, text.length );
@@ -65,6 +67,7 @@ export default function (injection, Vue) {
         for (i = 0; i < lines.length; i ++) {
             this.fillText(lines[i], x, y + i * lineHeight);
         }
+        return i * lineHeight;
     };
 
 }

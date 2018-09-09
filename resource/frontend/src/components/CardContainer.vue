@@ -227,10 +227,17 @@
 
                 y += parseInt(h / 8);
                 ctxBoard.fillStyle = '#ffffff';
-                ctxBoard.font = ctxBoard.getPropertySingleLineFont(translation, parseInt(h / 12));
-                ctxBoard.fillText(translation, 0, y);
+                ctxBoard.font = ctxBoard.getPropertySingleLineFont(translation, parseInt(h / 12), parseInt(h / 16));
 
-                y += parseInt(h / 8);
+                var transLines = ctxBoard.getTextLines(translation, cvsBoard.width, true);
+
+                if (transLines/length <= 1) {
+                    ctxBoard.fillText(translation, 0, y);
+                    y += parseInt(h / 8);
+                } else {
+                    y += ctxBoard.fillTextLines(transLines, 0, y);
+                }
+
                 ctxBoard.fillStyle = '#61839f';
                 ctxBoard.font = ctxBoard.getPropertyMultiLineFont(context, cvsBoard.width, parseInt(cvsBoard.height * 5 / 8), parseInt(h / 12))
                 ctxBoard.fillTextLines(ctxBoard.getTextLines(data.card.context), 0, y);

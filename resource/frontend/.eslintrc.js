@@ -11,4 +11,14 @@ module.exports = {
         'semi': 'off',
         'no-console': 0
     },
+    parser: "babel-eslint",
+    parserOptions: {
+        ecmaVersion: 6,
+        sourceType: "module",
+        ecmaFeatures: {
+            jsx: true,
+            modules: true,
+            experimentalObjectRestSpread: true
+        }
+    }
 }
