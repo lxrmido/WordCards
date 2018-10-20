@@ -46,10 +46,14 @@
                         next: [],
                         ignore: [],
                         star: []
+                    },
+                    times: {
+                        delay: 0
                     }
                 },
                 fullscreen: false,
-                isFocus: false
+                isFocus: false,
+                showExplainTimeout: null
             }
         },
         methods: {
@@ -59,6 +63,9 @@
                 }
                 Object.keys(settings.hotkeys).forEach((x) => {
                     this.updateKeysArray(x, settings.hotkeys[x]);
+                });
+                Object.keys(settings.times).forEach((x) => {
+                    this.settings.times[x] = settings.times[x];
                 });
                 this.isFocus = true;
             },
@@ -70,6 +77,7 @@
             },
             init () {
                 this.clock();
+                this.paintThread();
                 this.getWord();
                 window.addEventListener('keydown', (ev) => {
                     var isSet = false
@@ -102,7 +110,8 @@
                 if ((w !== this.availWidth) || (h !== this.availHeight)) {
                     this.resize(w, h);
                 }
-                setTimeout(this.clock, 100);
+                this.time += 50;
+                setTimeout(this.clock, 50);
             },
             resize (w, h) {
                 let cvsBoard = this.$refs.cvsBoard;
@@ -196,12 +205,42 @@
                 });
             },
             renderCard (data) {
-                let cvsBoard = this.$refs.cvsBoard;
-                let ctxBoard = cvsBoard.getContext('2d');
                 if (data) {
+                    this.time = 0;
                     this.currentData = data;
                 } else {
                     data = this.currentData;
+                }
+            },
+            raf (f) {
+                if ('requestAnimationFrame' in window) {
+                    return window.requestAnimationFrame(f);
+                }
+                if ('webkitRequestAnimationFrame' in window) {
+                    return window.webkitRequestAnimationFrame(f);
+                }
+                if ('mozRequestAnimationFrame' in window) {
+                    return window.mozRequestAnimationFrame(f);
+                }
+                if ('msRequestAnimationFrame' in window) {
+                    return window.msRequestAnimationFrame(f);
+                }
+                return setTimeout(f, 40);
+            },
+            paintThread () {
+                if (this.currentData && this.isFocus) {
+                    this.paintCard(this.currentData);
+                }
+                this.raf(this.paintThread);
+            },
+            paintCard (data) {
+                let cvsBoard = this.$refs.cvsBoard;
+                let ctxBoard = cvsBoard.getContext('2d');
+                let drawTranslation = true;
+                let drawContext = true;
+                if (this.time < this.settings.times.delay * 1000) {
+                    drawTranslation = false;
+                    drawContext = false;
                 }
                 this.index = data.index;
                 this.total = data.total;
@@ -226,21 +265,29 @@
                 ctxBoard.fillText(phonetic, 0, y);
 
                 y += parseInt(h / 8);
-                ctxBoard.fillStyle = '#ffffff';
-                ctxBoard.font = ctxBoard.getPropertySingleLineFont(translation, parseInt(h / 12), parseInt(h / 16));
+                
 
-                var transLines = ctxBoard.getTextLines(translation, cvsBoard.width, true);
-
-                if (transLines/length <= 1) {
-                    ctxBoard.fillText(translation, 0, y);
-                    y += parseInt(h / 8);
-                } else {
-                    y += ctxBoard.fillTextLines(transLines, 0, y);
+                if (drawTranslation) {
+                    ctxBoard.fillStyle = '#ffffff';
+                    ctxBoard.font = ctxBoard.getPropertySingleLineFont(translation, parseInt(h / 12), parseInt(h / 16));
+                    let transLines = ctxBoard.getTextLines(translation, cvsBoard.width, true);
+                        if (transLines/length <= 1) {
+                        ctxBoard.fillText(translation, 0, y);
+                        y += parseInt(h / 8);
+                    } else {
+                        y += ctxBoard.fillTextLines(transLines, 0, y);
+                    }
                 }
 
-                ctxBoard.fillStyle = '#61839f';
-                ctxBoard.font = ctxBoard.getPropertyMultiLineFont(context, cvsBoard.width, parseInt(cvsBoard.height * 5 / 8), parseInt(h / 12))
-                ctxBoard.fillTextLines(ctxBoard.getTextLines(data.card.context), 0, y);
+                if (drawContext) {
+                    ctxBoard.fillStyle = '#61839f';
+                    ctxBoard.font = ctxBoard.getPropertyMultiLineFont(context, cvsBoard.width, parseInt(cvsBoard.height * 5 / 8), parseInt(h / 12))
+                    ctxBoard.fillTextLines(ctxBoard.getTextLines(data.card.context), 0, y);
+                }
+
+                if (this.settings.times.delay > 0) {
+                    ctxBoard.fillRect(0, cvsBoard.height - 4, parseInt((1 - this.time / (this.settings.times.delay * 1000)) * cvsBoard.width), 4);
+                }
             }
         }
     }

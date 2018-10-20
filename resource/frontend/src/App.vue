@@ -42,6 +42,13 @@ export default {
                     val: settings.hotkeys[x].join(',')
                 });
             });
+            Object.keys(settings.times).forEach((x) => {
+                this.$api('setcfg', {
+                    key: x,
+                    type: 'int',
+                    val: settings.times[x]
+                });
+            });
             this.$refs.conCard.updateSettings(settings);
         }
     }

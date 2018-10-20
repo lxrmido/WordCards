@@ -8,11 +8,11 @@
                     快捷键
                 </div>
             </div>
-            <div class="row" v-for="(key, name) in settings.hotkeys">
+            <div class="row" v-for="(key, name) in settings.hotkeys" v-bind:key="name">
                 <div class="hot-key-type">
                     {{ getKeyLang(name) }}
                 </div>
-                <div class="hot-key-item" v-for="(k, kIndex) in key">
+                <div class="hot-key-item" v-for="(k, kIndex) in key" v-bind:key="k">
                     <div class="key">
                         {{ getNameByKeyCode(k) }}
                     </div>
@@ -21,6 +21,21 @@
                     </div>
                 </div>
                 <div class="add-key-btn" @click="addKey(name)">&#xe651;</div>
+            </div>
+            <div class="row">
+                <div class="group">
+                    时间设置
+                </div>
+            </div>
+            <div class="row">
+                <div class="setting-item-key">
+                     释义缓出(秒)
+                </div>
+                <div class="setting-adjust">
+                    <div class="btn dec" @click="updateTime('delay', 'dec')">&#xe65f;</div>
+                    <div class="indicator">{{ settings.times.delay }}</div>
+                    <div class="btn inc" @click="updateTime('delay', 'inc')">&#xe615;</div>
+                </div>
             </div>
         </div>
         <div class="mask" v-show="isWaitingInput">
@@ -40,6 +55,9 @@
                         next: [],
                         ignore: [],
                         star: []
+                    },
+                    times: {
+                        delay: 0
                     }
                 },
                 isWaitingInput: false
@@ -50,12 +68,30 @@
                 Object.keys(settings.hotkeys).forEach((x) => {
                     this.updateKeysArray(x, settings.hotkeys[x]);
                 })
+                Object.keys(settings.times).forEach((x) => {
+                    this.settings.times[x] = settings.times[x];
+                })
             },
             updateKeysArray (k, arr) {
                 this.settings.hotkeys[k].length = 0;
                 arr.forEach((x) => {
                     this.settings.hotkeys[k].push(x);
                 });
+            },
+            updateTime (key, val) {
+                switch (val) {
+                    case 'inc':
+                        this.settings.times[key] ++;
+                        break;
+                    case 'dec':
+                        if (this.settings.times[key] >= 0) {
+                            this.settings.times[key] --;
+                        }
+                        break;
+                    default:
+                        this.settings.times[key] = val;
+                        break;
+                }
             },
             getKeyLang (key) {
                 var map = {
@@ -327,6 +363,61 @@
         background-color: #434749; 
         color: #e3e7e9;
         border-radius: 12px;
+    }
+    .setting-item-key{
+        width: 100px;
+        float: left;
+        height: 32px;
+        line-height: 32px;
+    }
+    .setting-adjust{
+        height: 32px;
+        width: auto;
+        min-width: 1px;
+        overflow: hidden;
+        float: left;
+        position: relative;
+        > .btn{
+            float: left;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            font-family: opfont;
+            text-align: center;
+            font-size: 12px;
+            cursor: pointer;
+            user-select: none;
+            margin: 4px 0;
+            background-color: #434749; 
+            color: #e3e7e9;
+            border-radius: 12px;
+            position: relative;
+            &.dec{
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+            &.inc{
+                border-top-left-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+        }
+        > .indicator{
+            float: left;
+            width: 48px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            font-family: opfont;
+            text-align: center;
+            font-size: 12px;
+            cursor: pointer;
+            user-select: none;
+            margin: 4px 0;
+            background-color: #434749; 
+            color: #e3e7e9;
+            position: relative;
+        }
     }
     .mask{
         position: absolute;

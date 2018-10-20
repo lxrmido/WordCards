@@ -66,8 +66,27 @@ apiRouter.post('/setkey', async (ctx) => {
     let val = ctx.request.body.val.split(',');
     progress.vars['hk_' + key] = [];
     val.forEach((x) => {
-        progress.vars['hk_' + key].push(parseInt(x));
+        let kv = parseInt(x);
+        if (kv > 0){
+            progress.vars['hk_' + key].push(kv);
+        }
     });
+    progress.save();
+    ctx.body = makeJsonReturn();
+});
+apiRouter.post('/setcfg', async (ctx) => {
+    let key  = ctx.request.body.key;
+    let type = ctx.request.body.type;
+    let val  = ctx.request.body.val;
+    switch (type) {
+        case 'int':
+            val = parseInt(val);
+            break;
+        default:
+            break;
+    }
+    progress.vars['cfg_' + key] = val;
+    console.log(progress);
     progress.save();
     ctx.body = makeJsonReturn();
 });
@@ -107,6 +126,9 @@ function getSettings(){
             next: progress.vars.hk_next,
             star: progress.vars.hk_star,
             ignore: progress.vars.hk_ignore
+        },
+        times: {
+            delay: progress.vars.cfg_delay
         }
     }
 }
